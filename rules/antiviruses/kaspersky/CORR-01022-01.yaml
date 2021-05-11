@@ -1,0 +1,39 @@
+name: CORR-KASPERSKY-MALWARE-ORGANIZATION-EPIDEMIC
+
+index: correlated
+
+realert:
+  minutes: 0
+
+type: cardinality
+
+timeframe:
+  days: 3
+
+cardinality_field: 'source.host'
+
+max_cardinality: 5
+
+filter:
+  - query:
+      query_string:
+        query: '
+          correlation.name: (
+          "CORR-KASPERSKY-MALWARE-NEUTRALIZED"
+          OR "CORR-KASPERSKY-MALWARE-NOTNEUTRALIZED"
+          )
+	    '
+
+query_key: 
+ - 'collector.organization'
+ - 'data.aux5'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'kaspersky'
+
+system: 'antivirus'
+
+event_category: 'malware'

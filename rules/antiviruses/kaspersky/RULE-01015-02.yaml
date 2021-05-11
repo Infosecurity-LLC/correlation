@@ -1,0 +1,24 @@
+name: RULE-01015-02
+
+index: correlated
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          correlation.name: "CORR-KASPERSKY-SPECIAL-HACKTOOL-NOTNEUTRALIZED"
+	    '
+
+aggregation:
+  minutes: 4
+  
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+ 
+alert: custom_alerters.kafka_incidents.KafkaAlerter

@@ -1,0 +1,13 @@
+name: RULE-04065-02
+index: correlated
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'correlation.name: "CORR-MSWINDOWS-AUTHORIZATION-NON-WORKING-HOURS"'
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter
+

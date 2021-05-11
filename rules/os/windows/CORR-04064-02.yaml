@@ -1,0 +1,42 @@
+name: CORR-MSWINDOWS-FORBIDDEN-WORK-ON-WEEKENDS
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 30
+
+type: any
+filter:
+ - query:
+     query_string:
+        query: '
+          (
+            (
+              data.msgId: "4624"
+              AND (interaction.logonType: "2" OR "7" OR "10")
+            )
+            OR data.msgId: "4801"
+          )
+          AND subject.enrichment.isWorkingDay: false
+        '
+
+# Event ID: "4624" - An account was successfully logged on
+# logonType: 2 - interactively
+# logonType: 10 - remote
+# logonType: 7 - workstation unlocked
+# TODO: logonType: 3
+# Event ID: "4801" - The workstation was unlocked
+
+aggregation:
+  minutes: 5
+aggregation_key: 
+ - 'collector.organization'
+ - 'subject.name'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'access'
+severity: 'LOW'
+

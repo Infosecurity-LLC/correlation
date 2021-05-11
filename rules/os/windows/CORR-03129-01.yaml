@@ -1,0 +1,29 @@
+name: CORR-MSWINDOWS-CREATING-SERVICE
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "7045"'
+
+# Event ID: "7045" - A new service was installed in the system.
+
+aggregation:
+  minutes: 2
+  
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ActionsControl'
+list: 'critical_hosts'

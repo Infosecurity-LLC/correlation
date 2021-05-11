@@ -1,0 +1,42 @@
+name: CORR-AUDITD-LOGIN-RESTRICTED-TIME-ON-CRITICAL-HOST
+
+index: correlator-auditd-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          data.msgId: "USER_LOGIN" 
+          AND interaction.status: "success" 
+          AND _exists_: subject.id 
+          AND _exists_: eventSource.location.host
+        '
+# type="USER_LOGIN" - Triggered when a user logs in.
+# Additional filter in script: eventSource.location.host must be in unix_critical_hosts
+# Additional filter in script: The event time is NOT between hour_start and hour_end for the subject.id from unix_authorization index
+
+aggregation:
+  minutes: 5
+
+aggregation_key:
+ - 'collector.organization'
+ - 'eventSource.location.host'
+ - 'subject.id'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'linux'
+
+system: 'os'
+
+event_category: 'access'
+
+list: 'unix_critical_hosts'

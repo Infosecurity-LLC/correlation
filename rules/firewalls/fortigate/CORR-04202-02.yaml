@@ -1,0 +1,50 @@
+name: CORR-FORTIGATE-VPN-GET-STOP-TIME
+
+index: correlator-fortigate-%Y.%m.%d
+use_strftime_index: true
+
+run_every:
+  minutes: 1440
+
+buffer_time:
+  minutes: 1440
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          data.msgId:(
+            "0101039425"
+            OR "0101040002"
+            OR "0101039948"
+          )
+          AND _exists_:collector.organization 
+          AND _exists_:subject.domain 
+          AND _exists_:subject.name
+        '
+# "msgId": "0101039425" / SSL VPN tunnel down
+# "msgId": "0101040002" / PPTP tunnel down
+# "msgId": "0101039948" / SSL VPN tunnel down
+
+aggregation:
+  minutes: 1
+  
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.domain'
+ - 'subject.name'
+
+alert: custom_alerters.vpn_win_corr.AVGTime
+
+out_es_index: vpn_win_correlation
+
+vendor: 'fortinet'
+
+system: 'firewall'
+
+event_category: 'access'

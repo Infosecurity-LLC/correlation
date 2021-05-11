@@ -1,0 +1,29 @@
+name: CORR-CISCOASA-SUCCESSFUL-USER-AUTHENTICATION
+index: correlator-cisco_asa_401-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: ("611101" OR "605005")'
+
+# Message: "611101" - User authentication succeeded
+# Message: "605005" - Login permitted
+
+aggregation:
+  minutes: 3
+
+aggregation_key: 
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'cisco'
+system: 'firewall'
+event_category: 'access'
+list: 'allowed_accounts_network'

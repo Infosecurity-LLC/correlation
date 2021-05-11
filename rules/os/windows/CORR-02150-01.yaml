@@ -1,0 +1,37 @@
+name: CORR-MSWINDOWS-MONITORED-PROCESS-CREATED
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          data.msgId: "4688"
+        '
+# Event ID: "4688" - A new process has been created
+# Script has an additional check of the list "monitored_app_list"
+
+aggregation:
+  minutes: 5
+  
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.name'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'microsoft'
+
+system: 'os'
+
+event_category: 'ActionsControl'
+
+list: 'monitored_app_list'

@@ -1,0 +1,13 @@
+name: RULE-01022-03
+index: correlated
+realert:
+  minutes: 0
+
+type: any
+filter:
+  - query:
+      query_string:
+        query: 'correlation.name: "CORR-NOD32-MALWARE-ORGANIZATION-EPIDEMIC"'
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter
+

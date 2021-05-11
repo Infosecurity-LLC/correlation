@@ -1,0 +1,59 @@
+unix_authorization
+replicas: 1
+-------------------------------
+{
+  "settings": {
+    "index": {
+      "number_of_shards": "5",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "added": {
+          "format": "dateOptionalTime",
+          "type": "date"
+        },
+        "organization": {
+          "type": "keyword"
+        },
+        "account": {
+          "type": "keyword"
+        },
+        "uid": {
+          "type": "keyword"
+        },
+        "hostname": {
+          "type": "keyword"
+        },
+        "ipaddr": {
+          "type": "keyword"
+        },
+        "filename": {
+          "type": "keyword"
+        },
+        "process": {
+          "type": "keyword"
+        },
+        "hour_start": {
+          "type": "keyword"
+        },
+        "hour_end": {
+          "type": "keyword"
+        },
+        "weekend": {
+          "type": "keyword"
+        },
+        "ticket_id": {
+          "type": "keyword"
+        },
+        "description": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
+
+

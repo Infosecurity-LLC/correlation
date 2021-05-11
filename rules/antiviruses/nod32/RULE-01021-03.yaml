@@ -1,0 +1,12 @@
+name: RULE-01021-03
+index: correlated
+realert:
+  minutes: 0
+
+type: any
+filter:
+  - query:
+      query_string:
+        query: 'correlation.name: "CORR-NOD32-MALICIOUS-OBJECTS-NEUTRALIZED"'
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter

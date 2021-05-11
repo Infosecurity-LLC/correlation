@@ -1,0 +1,50 @@
+name: CORR-WINDOWS-LOGON-RESTRICTED-TIME
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          (
+            (
+              data.msgId: "4624" 
+              AND (
+                interaction.logonType: 2 
+                OR interaction.logonType: 10
+              ) 
+            ) 
+            OR data.msgId: "4801"
+          ) 
+          AND NOT subject.enrichment.isHostAccessTimeAllowed: true
+        '
+# Event ID: "4624" - Успешный вход в систему
+# Event ID: "4801" - Рабочая станция была разблокирована
+# Logon Type: 2 - Интерактивный (вход с клавиатуры или экрана системы)
+# Logon Type: 10 - RemoteInteractive (Терминальные службы, Удаленный рабочий стол или удаленный помощник)
+# isHostAccessTimeAllowed - Флаг, отображающий разрешен ли доступ к данному хосту в данное время
+# Additional filter in __init__.py: subject.name is not ("^DWM-[0-9]+$")
+# Additional filter in __init__.py: subject.name is not ("^UMFD-[0-9]+$")
+
+aggregation:
+  minutes: 5
+  
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.name'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'microsoft'
+
+system: 'os'
+
+event_category: 'access'

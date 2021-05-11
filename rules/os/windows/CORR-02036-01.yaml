@@ -1,0 +1,37 @@
+name: CORR-MSWINDOWS-MEMBER-ADDED-GROUP
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: ("4732" OR "4746" OR "4728" OR "4751" OR "4756" OR "4761" OR "4787" OR "4785")
+               AND NOT (subject.id: "S-1-5-18")
+              '
+
+# Event ID: "4732" - A member was added to a security-enabled local group
+# Event ID: "4746" - A member was added to a security-disabled local group
+# Event ID: "4728" - A member was added to a security-enabled global group
+# Event ID: "4751" - A member was added to a security-disabled global group
+# Event ID: "4756" - A member was added to a security-enabled universal group
+# Event ID: "4761" - A member was added to a security-disabled universal group
+# Event ID: "4787" - A non-member was added to a basic application group
+# Event ID: "4785" - A member was added to a basic application group
+
+aggregation:
+  minutes: 1
+
+aggregation_key:
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ActionsControl'
+list: 'critical_groups_windows'

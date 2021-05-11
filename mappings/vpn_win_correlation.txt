@@ -1,0 +1,75 @@
+vpn_win_correlation
+_doc
+replicas: 1
+-------------------------------
+{
+  "settings": {
+    "index": {
+      "number_of_shards": "5",
+      "number_of_replicas": "1"
+    }
+  },
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "@timestamp": {
+          "format": "dateOptionalTime",
+          "type": "date"
+        },
+        "organization": {
+          "type": "keyword"
+        },
+        "domain": {
+          "type": "keyword"
+        },
+        "username": {
+          "type": "keyword"
+        },
+        "vpn_status": {
+          "type": "keyword"
+        },
+        "vpn_last_session_id": {
+          "type": "keyword"
+        },
+        "vpn_last_src_ip": {
+          "type": "keyword"
+        },
+        "vpn_last_src_country": {
+          "type": "keyword"
+        },
+        "vpn_early_start_time": {
+          "type": "keyword"
+        },
+        "vpn_later_stop_time": {
+          "type": "keyword"
+        },
+        "vpn_start_time_avg": {
+          "type": "keyword"
+        },
+        "vpn_stop_time_avg": {
+          "type": "keyword"
+        },
+        "win_status": {
+          "type": "keyword"
+        },
+        "win_last_logged_host": {
+          "type": "keyword"
+        },
+        "win_early_login_time": {
+          "type": "keyword"
+        },
+        "win_later_logout_time": {
+          "type": "keyword"
+        },
+        "win_login_time_avg": {
+          "type": "keyword"
+        },
+        "win_logout_time_avg": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
+
+

@@ -1,0 +1,17 @@
+name: RULE-06137-01
+
+index: correlated
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          correlation.name: "CORR-FAIL2BAN-SSH-BAN"
+        '
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter

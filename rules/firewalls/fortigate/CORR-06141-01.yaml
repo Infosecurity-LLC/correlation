@@ -1,0 +1,36 @@
+name: CORR-FORTIGATE-TOR-OUTGOING-CONNECTION
+
+index: correlator-fortigate-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          eventSource.subsys: "utm" 
+          AND data.aux5: tor* 
+          AND source.enrichment.isNetworkLocal: true 
+          AND destination.enrichment.isNetworkLocal: false
+        '
+
+aggregation:
+  minutes: 5
+  
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'fortinet'
+
+system: 'firewall'
+
+event_category: 'network'

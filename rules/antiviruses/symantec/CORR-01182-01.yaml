@@ -1,0 +1,26 @@
+name: CORR-SYMANTECEP-SMB-MS17-010
+
+index: correlator-symantec_endpoint_protection-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+  - query:
+      query_string:
+        query: 'data.aux10: "23875"'
+        # 23875 - SignatureID Symantec for OS Attack: Microsoft SMB MS17-010 Disclosure
+
+aggregation:
+  minutes: 2
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'symantec'
+system: 'antivirus'
+event_category: 'NetworkAttack'

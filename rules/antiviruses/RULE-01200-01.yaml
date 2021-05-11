@@ -1,0 +1,17 @@
+name: RULE-01200-01
+
+index: correlated
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          correlation.name: "CORR-ANTIVIRUSES-MALWARE-ORGANIZATION-EPIDEMIC-HASH"
+        '
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter

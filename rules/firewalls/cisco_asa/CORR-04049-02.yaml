@@ -1,0 +1,34 @@
+name: CORR-CISCOASA-BRUTE-FORCE-ACCOUNT
+index: correlator-cisco_asa_401-%Y.%m.%d
+use_strftime_index: true
+realert:
+  minutes: 0
+
+type: frequency
+num_events: 50
+timeframe:
+  minutes: 15
+
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "113015"'
+
+# Event ID: "113015" - User authentication failure
+
+query_key:
+ - 'collector.organization'
+ - 'subject.name'
+
+aggregation:
+  minutes: 3
+aggregation_key: 
+ - 'collector.organization'
+ - 'subject.name'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'cisco'
+system: 'firewall'
+event_category: 'access'
+severity: 'HIGH'

@@ -1,0 +1,42 @@
+name: CORR-ANTIVIRUSES-MALWARE-ORGANIZATION-EPIDEMIC-HASH
+
+index: correlated
+
+realert:
+  minutes: 0
+
+type: cardinality
+
+timeframe:
+  days: 3
+
+cardinality_field: 'source.host'
+
+max_cardinality: 5
+
+filter:
+  - query:
+      query_string:
+        query: '
+          eventSource.category: "AntiVirus" 
+          AND object.category: "malwareObject" 
+          AND _exists_:data.aux1 
+          AND NOT correlation.name: "CORR-ANTIVIRUSES-MALWARE-ORGANIZATION-EPIDEMIC-HASH"
+        '
+# data.aux1 - Хэш-сумма вредоносного объекта 
+
+query_key: 
+ - 'collector.organization'
+ - 'data.aux1'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'all'
+
+system: 'antivirus'
+
+event_category: 'malware'
+
+severity: 'HIGH'

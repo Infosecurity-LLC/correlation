@@ -1,0 +1,6 @@
+**/__pycache__/**
+venv/
+.idea
+# ignore java-specific
+liquibase/.gradle
+liquibase/build

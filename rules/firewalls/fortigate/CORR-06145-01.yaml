@@ -1,0 +1,60 @@
+name: CORR-FORTIGATE-RAT-CONNECTION-FROM-INTERNET-TO-LOCAL
+
+index: correlator-fortigate-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          source.enrichment.isNetworkLocal: false
+          AND destination.enrichment.isNetworkLocal: true
+          AND NOT subject.enrichment.isHostAccessTimeAllowed: true
+          AND (
+           (
+             destination.port:(
+			   22 
+			   OR 3389 
+			   OR 4899 
+			   OR 5279
+			   OR 4279
+			   OR 34012
+			   OR 2000
+			   OR 5900
+			 )
+           )
+           OR
+           (
+             data.aux8: "remote.access"
+             AND data.msgId:(
+			   "1059028704"
+			   OR "1059028705"
+			 )
+           )
+          )
+        '
+
+# "1059028704" - Application control (IPS) (pass)
+# "1059028705" - Application control (IPS) (block)
+
+aggregation:
+  minutes: 5
+  
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'fortinet'
+
+system: 'firewall'
+
+event_category: 'network'

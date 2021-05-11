@@ -1,0 +1,50 @@
+name: CORR-FORTIGATE-OUTGOING-CONNECTION-BOTNET
+
+index: correlator-fortigate-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          _exists_: source.host 
+          AND source.enrichment.isNetworkLocal: true 
+          AND destination.enrichment.isNetworkLocal: false 
+          AND eventSource.subsys: "utm" 
+          AND (
+            data.msgId: (
+            "0419016400" 
+            OR "0419016401" 
+            OR "1501054600" 
+            OR "1501054601"
+            ) 
+            OR data.aux8: *.botnet
+          )
+        '
+# Message ID 0419016400: 04 - IPS; 19 - Signature; 016400 - Botnet C&C Communication (warning)
+# Message ID 0419016401: 04 - IPS; 19 - Signature; 016401 - Botnet C&C Communication (notice)
+# Message ID 1501054600: 15 - DNS; 01 - Response; 054600 - Domain blocked by DNS botnet C&C (IP)
+# Message ID 1501054601: 15 - DNS; 01 - Response; 054601 - Domain blocked by DNS botnet C&C (Domain)
+# data.aux8 - attack
+
+aggregation:
+  minutes: 3
+  
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'fortinet'
+
+system: 'firewall'
+
+event_category: 'network'

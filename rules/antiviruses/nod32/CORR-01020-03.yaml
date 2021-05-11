@@ -1,0 +1,29 @@
+name: CORR-NOD32-MALICIOUS-OBJECTS
+index: correlator-nod32-%Y.%m.%d
+use_strftime_index: true
+realert:
+  minutes: 0
+
+type: any
+filter:
+  - query:
+      query_string:
+        query: 'data.msgId: "threat_event"'
+
+aggregation:
+  minutes: 3
+aggregation_key:
+ - 'collector.organization'
+ - 'eventSource.location.host'
+ - 'source.host'
+ - 'data.aux3'
+ - 'object.path'
+
+# data.aux3 - threat_name
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'eset'
+system: 'antivirus'
+event_category: 'malware'
+severity: 'HIGH'

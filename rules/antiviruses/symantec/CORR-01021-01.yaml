@@ -1,0 +1,26 @@
+name: CORR-SYMANTECEP-MALWARE-DELETED
+
+index: correlator-symantec_endpoint_protection-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+  - query:
+      query_string:
+        query: 'data.aux3: "sep_file"
+                AND data.aux8: "1"'
+
+aggregation:
+  minutes: 2
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'symantec'
+system: 'antivirus'
+event_category: 'malware'

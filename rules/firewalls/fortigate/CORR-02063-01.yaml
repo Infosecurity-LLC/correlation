@@ -1,0 +1,171 @@
+name: CORR-FORTIGATE-ILLEGAL-ADMIN-ACTIVITY
+
+index: correlator-fortigate-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          data.msgId: (
+            "0100032138" OR "0100032200" OR "0100032190" 
+            OR "0100032191" OR "0100032192" OR "0100032193" 
+            OR "0100032194" OR "0100032201" OR "0100032215" 
+            OR "0100032202" OR "0100032199" OR "0100032226" 
+            OR "0100032228" OR "0100032229" OR "0100032230" 
+            OR "0100032233" OR "0100032234" OR "0100032235" 
+            OR "0100032236" OR "0100032237" OR "0100032238" 
+            OR "0100032239" OR "0100032241" OR "0100032203" 
+            OR "0100032209" OR "0100032218" OR "0100032227" 
+            OR "0100032219" OR "0100032220" OR "0100032221" 
+            OR "0100032223" OR "0100032224" OR "0100032231" 
+            OR "0100032232" OR "0100032242" OR "0100032243" 
+            OR "0100032244" OR "0100032245" OR "0100032246" 
+            OR "0100032252" OR "0100032253" OR "0100032254" 
+            OR "0100032255" OR "0100032300" OR "0100032301" 
+            OR "0100032302" OR "0100032545" OR "0100032547" 
+            OR "0100032548" OR "0100032550" OR "0100032551" 
+            OR "0100032552" OR "0100032564" OR "0100032565" 
+            OR "0100032566" OR "0100032567" OR "0100032569" 
+            OR "0100032601" OR "0100032602" OR "0100032603" 
+            OR "0100032604" OR "0100032605" OR "0100032606" 
+            OR "0100032607" OR "0100032608" OR "0100032609" 
+            OR "0100032611" OR "0100032612" OR "0100032613" 
+            OR "0100032614" OR "0100032615" OR "0100032616" 
+            OR "0100032617" OR "0100032693" OR "0100032694" 
+            OR "0100032695" OR "0100032696" OR "0100032697" 
+            OR "0100032698" OR "0100032699" OR "0100035014" 
+            OR "0100035015" OR "0100036882" OR "0100045161" 
+            OR "0100044544" OR "0100044545" OR "0100044546" 
+            OR "0100044547" OR "0100044548" OR "0100044549" 
+            OR "0100044550" OR "0100044551" OR "0100044552"
+          )
+        '
+# Additional filtering in script using lists:
+# - 'fortigate_superadmins'
+# - 'fortigate_admin_allowed_actions'
+# - 'fortigate_admin_forbidden_actions'
+
+# Object needed:
+# 0100044544 - Path configured
+# 0100044545 - Object configured
+# 0100044546 - Attribute configured
+# 0100044547 - Object attribute configured
+# 0100044548 - Action performed
+# 0100044549 - Object attribute configured by maintainer
+# 0100044550 - Object configured by maintainer
+# 0100044551 - Attribute configured by maintainer
+# 0100044552 - Path configured by maintainer
+
+# Without object:
+# 0100032138 - Device rebooted
+# 0100032190 - Invalid image loaded
+# 0100032191 - Image with invalid CC signature loaded
+# 0100032192 - Image with invalid RSA signature loaded
+# 0100032193 - Image with valid RSA signature loaded
+# 0100032194 - System upgrade failed due to file operation failure
+# 0100032199 - Image restored from USB
+# 0100032200 - Device shutdown
+# 0100032201 - Image loaded successfully
+# 0100032202 - Image restored
+# 0100032203 - Configuration restored
+# 0100032209 - IPS custom signatures restored
+# 0100032215 - Image updated
+# 0100032218 - DLP fingerprint database update via SCP failed
+# 0100032219 - Error output backup via SCP successful
+# 0100032220 - Batch mode command output backup via SCP successful
+# 0100032221 - VM license installed via SCP
+# 0100032223 - IPS custom signatures backup success
+# 0100032224 - Disk logs backed up
+# 0100032226 - Image failed to load
+# 0100032227 - DLP fingerprint database failed to update by SCP
+# 0100032228 - Firmware image loaded incorrect
+# 0100032229 - Firmware image without valid RSA signature loaded
+# 0100032230 - Firmware image with invalid RSA signature loaded
+# 0100032231 - FortiGuard service failed to restore
+# 0100032232 - VM license failed to restore
+# 0100032233 - Firmware image backup failed
+# 0100032234 - Image with invalid CC signature restored
+# 0100032235 - Image restored from FortiGuard Management
+# 0100032236 - Memory logs backed up
+# 0100032237 - Memory logs failed to back up
+# 0100032238 - Disk logs failed to back up
+# 0100032239 - Disk logs backed up to USB
+# 0100032241 - Disk logs failed to back up to USB
+# 0100032242 - VM license failed to install via SCP
+# 0100032243 - IPS package updated via SCP
+# 0100032244 - IPS package failed to update via SCP
+# 0100032245 - IPS custom signatures backup failed
+# 0100032246 - IPS custom signatures restored critical
+# 0100032252 - Factory settings reset
+# 0100032253 - RAID disk formatted
+# 0100032254 - RAID enabled
+# 0100032255 - RAID disabled
+# 0100032300 - Report image file uploaded
+# 0100032301 - VDOM added
+# 0100032302 - VDOM deleted
+# 0100032545 - Scheduled daily reboot started
+# 0100032547 - Autoscript start
+# 0100032548 - Autoscript stop
+# 0100032550 - Autoscript delete result
+# 0100032551 - Autoscript backup result
+# 0100032552 - Autoscript check status
+# 0100032564 - Configuration failed to restore
+# 0100032565 - Configuration restored from management station
+# 0100032566 - Configuration restored by SCP
+# 0100032567 - Configuration restored by USB
+# 0100032569 - Switch-Controller
+# 0100032601 - Switch-Controller discovered
+# 0100032602 - Switch-Controller authorized
+# 0100032603 - Switch-Controller deauthorized
+# 0100032604 - Switch-Controller deleted
+# 0100032605 - Switch-Controller Tunnel Up
+# 0100032606 - Switch-Controller Tunnel Down
+# 0100032607 - Image push to FortiSwitch
+# 0100032608 - Image stage to FortiSwitch
+# 0100032609 - Disable FortiSwitch Discovery
+# 0100032611 - Export port to pool
+# 0100032612 - Export port to vdom
+# 0100032613 - Request port from pool
+# 0100032614 - Return port to pool
+# 0100032615 - FortiSwitch MAC add
+# 0100032616 - FortiSwitch MAC delete
+# 0100032617 - FortiSwitch MAC move
+# 0100032693 - FortiSwitch switch controller
+# 0100032694 - FortiSwitch PoE
+# 0100032695 - FortiSwitch link
+# 0100032696 - FortiSwitch spanning Tree
+# 0100032697 - FortiSwitch switch
+# 0100032698 - FortiSwitch router
+# 0100032699 - FortiSwitch system
+# 0100035014 - HA reset uptime
+# 0100035015 - HA clear history
+# 0100036882 - Configuration manually saved
+# 0100045161 - Unknown
+
+aggregation:
+  minutes: 5
+  
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.name'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'fortinet'
+
+system: 'firewall'
+
+event_category: 'ActionsControl'
+
+list:
+ - 'fortigate_superadmins'
+ - 'fortigate_admin_allowed_actions'
+ - 'fortigate_admin_forbidden_actions'

@@ -1,0 +1,27 @@
+name: RULE-04203-01
+
+index: correlated
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          correlation.name: "CORR-MSWINDOWS-LOGIN-ANOMALY-TIME"
+        '
+
+aggregation:
+  minutes: 5
+
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.domain'
+ - 'subject.name'
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter
+
+severity: 'MEDIUM'

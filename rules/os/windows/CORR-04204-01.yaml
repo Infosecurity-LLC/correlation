@@ -1,0 +1,41 @@
+name: CORR-MSWINDOWS-AUTHORIZATION-FROM-DIFFERENT-COUNTRIES
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+realert:
+  minutes: 60
+
+type: cardinality
+cardinality_field: 'source.enrichment.geo.country'
+timeframe:
+  minutes: 60
+max_cardinality: 1  # еще +1 по факту
+
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "4624"
+               AND (interaction.logonType: "2" OR "3" OR "7" OR "10")'
+
+# Event ID: "4624" - An account was successfully logged on
+# logonType: 2 - interactively
+# logonType: 3, 10 - remote
+# logonType: 7 - workstation unlocked
+
+query_key:
+ - 'collector.organization'
+ - 'subject.domain'
+ - 'subject.name'
+
+aggregation:
+  minutes: 3
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.domain'
+ - 'subject.name'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'access'
+severity: 'MEDIUM'

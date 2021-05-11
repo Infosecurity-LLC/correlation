@@ -1,0 +1,38 @@
+name: CORR-MSWINDOWS-RUNNING-PSEXEC
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          data.msgId: ("4688" OR "7045")
+        '
+# Event ID: "4688" - A new process has been created
+# Event ID: "7045" - New Service was installed
+# There is an additional check in the script by the name of PsExec-family files
+
+aggregation:
+  minutes: 5
+  
+aggregation_key:
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'microsoft'
+
+system: 'os'
+
+event_category: 'ActionsControl'
+
+severity: 'HIGH'

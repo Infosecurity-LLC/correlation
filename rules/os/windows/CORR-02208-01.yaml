@@ -1,0 +1,31 @@
+name: CORR-MSWINDOWS-WMI-PERSISTENCE-SCRIPT-EVENT-CONSUMER
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+realert:
+  minutes: 20
+
+type: any
+
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "4688"
+               AND data.aux6: "C:\\Windows\\System32\\svchost.exe"
+               AND object.path: "C:\\WINDOWS\\system32\\wbem\\scrcons.exe"
+       '
+
+# Event ID: "4688" - A new process has been created
+# data.aux6 - ParentProcessName
+
+aggregation:
+  minutes: 3
+aggregation_key:
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ActionsControl'
+severity: 'MEDIUM'

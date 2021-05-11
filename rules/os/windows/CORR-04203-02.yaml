@@ -1,0 +1,64 @@
+name: CORR-MSWINDOWS-GET-LOGOUT-TIME
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+run_every:
+  minutes: 1440
+
+buffer_time:
+  minutes: 1440
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          (
+            (
+              data.msgId: "4634" 
+              AND (
+                interaction.logonType: 2 
+                OR interaction.logonType: 10 
+                OR interaction.logonType: 7
+              ) 
+            ) 
+            OR data.msgId: "4647" 
+            OR data.msgId: "4800"
+          ) 
+          AND NOT subject.name: ("СИСТЕМА" OR "SYSTEM") 
+          AND _exists_:collector.organization 
+          AND _exists_:subject.domain 
+          AND _exists_:subject.name
+        '
+# Event ID: 4634: An account was logged off
+# Logon Type: 2 - Интерактивный (с клавиатуры или экрана системы)
+# Logon Type: 7 - Блокирование.
+# Logon Type: 10 - RemoteInteractive (Терминальные службы, Удаленный рабочий стол или удаленный помощник)
+# Event ID: 4647: User initiated logoff 
+# Event ID: 4800: The workstation was locked
+# Additional filter in script: subject.name is not ("^DWM-[0-9]+$")
+# Additional filter in script: subject.name is not ("^UMFD-[0-9]+$")
+# Additional filter in script: subject.name[-1] is not '$'
+
+aggregation:
+  minutes: 1
+  
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.domain'
+ - 'subject.name'
+
+alert: custom_alerters.vpn_win_corr.AVGTime
+
+out_es_index: vpn_win_correlation
+
+vendor: 'microsoft'
+
+system: 'os'
+
+event_category: 'access'

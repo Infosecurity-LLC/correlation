@@ -1,0 +1,23 @@
+name: RULE-01014-04
+
+index: correlated
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: 'correlation.name: "CORR-SYMANTECEP-SPECIAL-NOTAVIRUS-NOTNEUTRALIZED"'
+
+aggregation:
+  minutes: 2
+
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter

@@ -1,0 +1,48 @@
+name: CORR-MSWINDOWS-BRUTE-FORCE-ACCOUNT-KRB
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+realert:
+  minutes: 60
+
+type: frequency
+num_events: 5
+
+timeframe:
+  minutes: 15
+
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "4771"
+               AND interaction.reason: ("0x18" OR "0x12" OR "0xC")
+               AND NOT subject.name: ("АНОНИМНЫЙ ВХОД" OR "ANONYMOUS LOGON" OR "СИСТЕМА" OR "SYSTEM")
+               AND NOT subject.id: ("S-1-5-7" OR "S-1-5-18")
+              '
+
+# Event ID: "4771" - Kerberos pre-authentication failed
+# 0x18 - Pre-authentication information was invalid
+# 0x12 - Client’s credentials have been revoked
+# 0xC - Requested start time is later than end time
+# S-1-5-7 - Anonymous Logon
+# S-1-5-18 - System (or LocalSystem)
+# Additional filter in script: not event['subject']['name'].endswith('$')
+# key eventSource.location.ip for anti-duplicate
+
+query_key:
+ - 'collector.organization'
+ - 'subject.name'
+ - 'eventSource.location.ip'
+
+aggregation:
+  minutes: 3
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.name'
+ - 'eventSource.location.ip'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'access'
+severity: 'MEDIUM'

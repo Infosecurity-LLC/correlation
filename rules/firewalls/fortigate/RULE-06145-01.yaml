@@ -1,0 +1,20 @@
+name: RULE-06145-01
+
+index: correlated
+
+realert:
+  minutes: 0
+
+timeframe:
+  minutes: 5
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          correlation.name: "CORR-FORTIGATE-RAT-CONNECTION-FROM-INTERNET-TO-LOCAL"
+	    '
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter

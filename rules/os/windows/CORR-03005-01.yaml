@@ -1,0 +1,27 @@
+name: CORR-MSWINDOWS-GROUPS-TYPE-CHANGED
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "4764"'
+
+# Event ID: "4764" - A groups type was changed
+
+aggregation:
+  minutes: 2
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ChangeControl'

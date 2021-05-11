@@ -1,0 +1,37 @@
+name: CORR-WINDOWS-HIDDEN-SHARED-FOLDER-ACCESS
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          data.msgId: "5140" 
+          AND object.category: "url" 
+          AND NOT object.name: ("\\\\*\\SYSVOL" OR "\\\\*\\IPC$")
+          '
+# 5140: A network share object was accessed
+# Additional filter in __init__.py: object.name:/\\\\\*\\[a-zA-Z0-9_]+\$/
+
+aggregation:
+  minutes: 5
+  
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.name'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'microsoft'
+
+system: 'os'
+
+event_category: 'access'

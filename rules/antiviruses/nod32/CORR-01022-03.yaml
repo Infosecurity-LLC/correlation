@@ -1,0 +1,40 @@
+name: CORR-NOD32-MALWARE-ORGANIZATION-EPIDEMIC
+index: correlated
+realert:
+  minutes: 0
+
+type: cardinality 
+timeframe:
+  days: 3
+cardinality_field: 'source.host'
+max_cardinality: 4  # +1
+
+filter:
+  - query:
+      query_string:
+        query: '
+          correlation.name: (
+          "CORR-NOD32-MALICIOUS-OBJECTS-NOTNEUTRALIZED"
+          OR "CORR-NOD32-MALICIOUS-OBJECTS-NEUTRALIZED"
+          )
+        '
+
+query_key:
+ - 'collector.organization'
+ - 'data.aux3'
+
+aggregation:
+  minutes: 3
+aggregation_key: 
+ - 'collector.organization'
+ - 'data.aux3'
+
+# data.aux3 - threat_name
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'eset'
+system: 'antivirus'
+event_category: 'malware'
+severity: 'HIGH'
+

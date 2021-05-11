@@ -1,0 +1,12 @@
+name: RULE-02082-01
+index: correlated
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'correlation.name: "CORR-MSWINDOWS-CREATED-LOCAL-GROUP-ON-CRITICAL-HOST"'
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter

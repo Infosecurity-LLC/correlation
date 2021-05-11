@@ -1,0 +1,62 @@
+name: CORR-MSWINDOWS-GET-LOGIN-TIME
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+run_every:
+  minutes: 1440
+
+buffer_time:
+  minutes: 1440
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          (
+            (
+              data.msgId: "4624" 
+              AND (
+                interaction.logonType: 2 
+                OR interaction.logonType: 10 
+                OR interaction.logonType: 7
+              ) 
+            ) 
+            OR data.msgId: "4801"
+          ) 
+          AND NOT subject.name: ("АНОНИМНЫЙ ВХОД" OR "ANONYMOUS LOGON" OR "СИСТЕМА" OR "SYSTEM") 
+          AND _exists_:collector.organization 
+          AND _exists_:subject.domain 
+          AND _exists_:subject.name
+        '
+# Event ID: "4624" - Успешный вход в систему
+# Event ID: "4801" - Рабочая станция была разблокирована
+# Logon Type: 2 - Интерактивный (вход с клавиатуры или экрана системы)
+# Logon Type: 10 - RemoteInteractive (Терминальные службы, Удаленный рабочий стол или удаленный помощник)
+# Logon Type: 7 - Разблокирование. Рабочая станция разблокирована.
+# Additional filter in script: subject.name is not ("^DWM-[0-9]+$")
+# Additional filter in script: subject.name is not ("^UMFD-[0-9]+$")
+# Additional filter in script: subject.name[-1] is not '$'
+
+aggregation:
+  minutes: 1
+  
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.domain'
+ - 'subject.name'
+
+alert: custom_alerters.vpn_win_corr.AVGTime
+
+out_es_index: vpn_win_correlation
+
+vendor: 'microsoft'
+
+system: 'os'
+
+event_category: 'access'

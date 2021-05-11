@@ -1,0 +1,13 @@
+name: RULE-04200-01
+index: correlated
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'correlation.name: "CORR-MSWINDOWS-BRUTE-FORCE-PASSWORD-SPRAYING"'
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter
+

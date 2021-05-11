@@ -1,0 +1,37 @@
+name: CORR-MSWINDOWS-MEMBER-REMOVED-GROUP
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: ("4733" OR "4747" OR "4729" OR "4752" OR "4757" OR "4762" OR "4788" OR "4786")
+               AND NOT (subject.id: "S-1-5-18")
+              '
+
+# Event ID: "4733" - A member was removed from a security-enabled local group
+# Event ID: "4747" - A member was removed from a security-disabled local group
+# Event ID: "4729" - A member was removed from a security-enabled global group
+# Event ID: "4752" - A member was removed from a security-disabled global group
+# Event ID: "4757" - A member was removed from a security-enabled universal group
+# Event ID: "4762" - A member was removed from a security-disabled universal group
+# Event ID: "4788" - A non-member was removed from a basic application group
+# Event ID: "4786" - A member was removed from a basic application group
+
+aggregation:
+  minutes: 1
+
+aggregation_key: 
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ActionsControl'
+list: 'critical_groups_windows'

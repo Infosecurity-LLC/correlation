@@ -1,0 +1,12 @@
+name: RULE-04027-02
+index: correlated
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'correlation.name: "CORR-CISCOASA-SUCCESSFUL-USER-AUTHENTICATION-UNAUTHORIZED-ACCOUNT"'
+
+alert: custom_alerters.kafka_incidents.KafkaAlerter

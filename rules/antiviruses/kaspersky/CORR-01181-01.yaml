@@ -1,0 +1,33 @@
+name: CORR-KASPERSKY-NETWORKATTACK
+
+index: correlator-kaspersky_antivirus-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          interaction.reason: "NetworkAttack"
+        '
+
+aggregation:
+  minutes: 5
+  
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'kaspersky'
+
+system: 'antivirus'
+
+event_category: 'network'

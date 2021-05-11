@@ -1,0 +1,70 @@
+plugins {
+    id 'java'
+    id 'org.liquibase.gradle' version '2.0.1'
+    id 'distribution'
+    id 'maven-publish'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+def releasesRepoUrl = 'http://nexus.example/repository/maven-releases/'
+def snapshotsRepoUrl = 'http://nexus.example/repository/maven-snapshots/'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven {
+        url releasesRepoUrl
+    }
+    maven {
+        url snapshotsRepoUrl
+    }
+}
+
+dependencies {
+    liquibaseRuntime group: 'org.liquibase',  name: 'liquibase-core', version: '3.6.1'
+    liquibaseRuntime group: 'org.yaml',       name: 'snakeyaml',      version: '1.25'
+    liquibaseRuntime group: 'org.postgresql', name: 'postgresql',     version: '42.2.5'
+}
+
+liquibase {
+        activities {
+            //noinspection GroovyAssignabilityCheck
+            main {
+                changeLogFile 'changelog.yaml'
+                url System.properties['liquibase_url']
+                username System.properties['liquibase_user']
+                password System.properties['liquibase_password']
+            }
+        }
+    }
+
+distributions {
+    liquibase {
+        baseName = 'liquibase'
+        contents {
+            from 'changelog.yaml'
+            from 'liquibase.sh'
+            from project.configurations.liquibaseRuntime
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = System.properties['nexus_user']
+                password = System.properties['nexus_password']
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            artifact liquibaseDistZip
+        }
+    }
+}

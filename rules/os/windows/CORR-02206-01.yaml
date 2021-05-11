@@ -1,0 +1,35 @@
+name: CORR-MSWINDOWS-MALICIOUS-SERVICE-INSTALLATIONS
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "7045"'
+
+# Event ID: "7045" - A new service was installed in the system
+# Additional filter in script:    
+#   (winlog.event_data.ServiceName:("WCESERVICE" OR "WCE\ SERVICE")
+#    OR winlog.event_data.ServiceName.keyword:(pwdump* OR gsecdump* OR cachedump*)
+#    OR winlog.event_data.ServiceName:"mssecsvc2.0"
+#    OR winlog.event_data.ServiceFileName.keyword:*\PAExec*
+#    OR winlog.event_data.ServiceFileName.keyword:winexesvc.exe*
+#    OR winlog.event_data.ServiceFileName.keyword:*\DumpSvc.exe
+#    OR winlog.event_data.ServiceFileName.keyword:* net user * )
+
+aggregation:
+  minutes: 3
+
+aggregation_key:
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ActionsControl'
+severity: 'HIGH'

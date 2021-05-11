@@ -1,0 +1,33 @@
+name: CORR-MSWINDOWS-RUNNING-POWERSHELL
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "4100"
+         OR data.msgId: "4103"
+         OR data.msgId: "4104"
+         OR data.msgId: "40961"'
+
+# Event ID: "4100" - Executing Pipeline via PowerShell
+# Event ID: "4103" - Executing Pipeline via PowerShell
+# Event ID: "4104" - Execute a Remote Command via PowerShell
+# Event ID: "40961" - PowerShell Console Startup
+
+aggregation:
+  minutes: 2
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ActionsControl'

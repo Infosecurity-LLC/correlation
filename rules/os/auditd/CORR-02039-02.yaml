@@ -1,0 +1,40 @@
+name: CORR-AUDITD-ADD-USER-ON-CRITICAL-HOST
+
+index: correlator-auditd-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          data.msgId: "ADD_USER" 
+          AND interaction.status: "success" 
+          AND _exists_: eventSource.location.host
+        '
+# type=ADD_USER - Triggered when a user-space user account is added.
+# Additional filter in script: eventSource.location.host must be in unix_critical_hosts
+
+aggregation:
+  minutes: 3
+
+aggregation_key:
+ - 'collector.organization'
+ - 'eventSource.location.host'
+ - 'object.id'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'linux'
+
+system: 'os'
+
+event_category: 'ActionsControl'
+
+list: 'unix_critical_hosts'

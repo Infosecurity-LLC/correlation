@@ -1,0 +1,39 @@
+name: CORR-MSWINDOWS-OBJECT-FORBIDDEN-ACCESS-RESTRICTED-TIME
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+
+filter:
+  - query:
+      query_string:
+        query: '
+          data.msgId: "4663" 
+          AND NOT subject.enrichment.isObjectAccessAllowed: true
+          '
+# 4663: An attempt was made to access an object
+# isObjectAccessAllowed - Флаг, отображающий разрешен ли доступ к данному объекту в данное время
+# Additional filter in script: NOT subject.name:/*.\$/
+
+aggregation:
+  minutes: 5
+  
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.name'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'microsoft'
+
+system: 'os'
+
+event_category: 'access'
+
+severity: 'MEDIUM'

@@ -1,0 +1,66 @@
+name: CORR-MSWINDOWS-BRUTE-FORCE-PASSWORD-SPRAYING
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+realert:
+  minutes: 0
+
+type: cardinality
+cardinality_field: 'subject.name'
+timeframe:
+  minutes: 20
+max_cardinality: 29  # +1
+
+filter:
+ - query:
+     query_string:
+       query: '(
+                 (data.msgId: "4625"
+                     AND interaction.logonType: ("2" OR "3" OR "10")
+                     AND (interaction.reason: ("0xC0000064" OR "0xC000006A")
+                          OR data.aux5: ("0xC0000064" OR "0xC000006A")
+                          )
+                 )
+                 OR (data.msgId: "4776"
+                     AND interaction.reason: ("0xC0000064" OR "0xC000006A")
+                     )
+                 OR (data.msgId: "4771"
+                     AND interaction.reason: ("0x18" OR "0x12" OR "0xC")
+                     )
+               )
+               AND NOT subject.name: ("АНОНИМНЫЙ ВХОД" OR "ANONYMOUS LOGON" OR "СИСТЕМА" OR "SYSTEM")
+               AND NOT subject.id: ("S-1-5-7" OR "S-1-5-18")
+              '
+
+# Event ID: "4625" - An account failed to log on
+# logonType: 2 - interactively; 3, 10 - remote
+# 0xC0000064 - User logon with misspelled or bad user account
+# 0xC000006A - User logon with misspelled or bad password
+# Event ID: "4776" - The computer attempted to validate the credentials for an account
+# Event ID: "4771" - Kerberos pre-authentication failed
+# 0x18 - Pre-authentication information was invalid
+# 0x12 - Client’s credentials have been revoked
+# 0xC - Requested start time is later than end time
+# S-1-5-7 - Anonymous Logon
+# S-1-5-18 - System (or LocalSystem)
+# Additional filter in script: not event['subject']['name'].endswith('$')
+
+# TODO: Event ID: "4768" - A Kerberos authentication ticket (TGT) was requested
+
+query_key:
+ - 'collector.organization'
+ - 'eventSource.location.ip'
+ - 'source.ip'
+
+aggregation:
+  minutes: 5
+aggregation_key:
+ - 'collector.organization'
+ - 'eventSource.location.ip'
+ - 'source.ip'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'access'
+severity: 'HIGH'

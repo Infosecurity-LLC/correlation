@@ -1,0 +1,53 @@
+# The unique name for this rule
+# ElastAlert will not start if two rules share the same name
+name: EAMON-RULE-RUNS
+
+# The name of the index to query
+index: elastalert_status_status
+
+# Allows to ignore repeating alerts for a period of time
+realert:
+  minutes: 5
+
+# How often ElastAlert should query Elasticsearch
+run_every:
+  minutes: 2
+
+# Size of the query window
+buffer_time:
+  minutes: 5
+
+# There are at least a certain number of events in a given time frame
+type: frequency
+
+# The number of events which will trigger an alert, inclusive
+num_events: 1
+
+# The time that num_events must occur within
+timeframe:
+  minutes: 5
+
+# A list of Elasticsearch filters that are used to filter results
+filter:
+  - query:
+      query_string:
+        query: '*'
+
+# ElastAlert will poll Elasticsearch using the count api
+# ElastAlert will not download all of the matching documents
+# doc_type must be set to use this
+use_count_query: true 
+doc_type: '_doc'
+
+# Top X most common values for each of the fields
+top_count_keys: 
+  - "rule_name"
+
+# The number of terms to list
+top_count_number: 10000
+
+# To turn off ElastAlert attempting use the field name plus .raw
+raw_count_keys: false
+
+# A list of alerts to run on each match
+alert: custom_alerters.telegraf.TelegrafAlerter

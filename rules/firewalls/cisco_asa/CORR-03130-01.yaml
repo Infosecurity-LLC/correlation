@@ -1,0 +1,28 @@
+name: CORR-CISCOASA-CONFIGURATION-CHANGE
+index: correlator-cisco_asa_401-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: ("111008" OR "111010")'
+
+# Message: "111008" - The user entered any command, with the exception of a show command.
+# Message: "111010" - A user made a configuration change.
+
+aggregation:
+  minutes: 5
+
+aggregation_key: 
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'cisco'
+system: 'firewall'
+event_category: 'ChangeControl'

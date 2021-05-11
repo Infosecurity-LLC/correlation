@@ -1,0 +1,29 @@
+name: CORR-MSWINDOWS-ADDITION-SID-HISTORY-TO-ADOBJECT
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: ("4765" OR "4766")'
+
+# Event ID: "4765" - SID History was added to an account
+# Event ID: "4765" - An attempt to add SID History to an account failed
+
+aggregation:
+  minutes: 2
+
+aggregation_key:
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ActionsControl'
+severity: 'HIGH'
+

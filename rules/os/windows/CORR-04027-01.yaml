@@ -1,0 +1,34 @@
+name: CORR-MSWINDOWS-SUCCESSFUL-AUTHORIZATION
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "4624"
+               AND NOT (interaction.logonType: 3)
+               AND NOT subject.name: ("АНОНИМНЫЙ ВХОД" OR "ANONYMOUS LOGON" OR "СИСТЕМА" OR "SYSTEM")
+               AND NOT subject.id: ("S-1-5-7" OR "S-1-5-18")
+              '
+
+# Event ID: "4624" - An account was successfully logged on
+# S-1-5-7 - Anonymous Logon
+# S-1-5-18 - System (or LocalSystem)
+
+aggregation:
+  minutes: 3
+
+aggregation_key:
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'access'
+list: 'allowed_accounts_windows'

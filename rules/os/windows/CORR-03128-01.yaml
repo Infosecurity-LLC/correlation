@@ -1,0 +1,25 @@
+name: CORR-MSWINDOWS-DELETING-SECURITY-LOG
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+  - query:
+      query_string:
+        query: 'data.msgId: "1102"'
+
+aggregation:
+  minutes: 2
+aggregation_key: 
+ - 'collector.organization'
+ - 'source.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ChangeControl'

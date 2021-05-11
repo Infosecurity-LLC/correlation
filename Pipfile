@@ -1,0 +1,25 @@
+[[source]]
+url = "http://example.com/repository/simple/"
+verify_ssl = false
+
+[dev-packages]
+
+[packages]
+socutils = {version = ">=1.5.9"}
+elastalert = {version = ">=0.2.1"}
+confluent-kafka = {version = "==1.3.0"}
+elasticsearch = {version = "==7.0.0"}
+python-dateutil = {version = "<2.7.0"}
+numpy = {version = ">=1.19.4"}
+#bson = {version = "*"}
+#raven = {version = "*"}
+#requests = {version = "*"}
+#pyyaml = {version = "*"}
+#jinja2 = {version = "*"}
+
+[requires]
+python_version = "3.6"
+
+
+
+

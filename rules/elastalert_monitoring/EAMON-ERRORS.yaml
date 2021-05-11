@@ -1,0 +1,21 @@
+# The unique name for this rule
+# ElastAlert will not start if two rules share the same name
+name: EAMON-ERRORS
+
+# The name of the index to query
+index: elastalert_status_error
+
+# Allows to ignore repeating alerts for a period of time
+realert:
+  minutes: 0
+
+type: any
+
+# A list of Elasticsearch filters that are used to filter results
+filter:
+  - query:
+      query_string:
+        query: '*'
+
+# A list of alerts to run on each match
+alert: custom_alerters.telegraf.TelegrafAlerter

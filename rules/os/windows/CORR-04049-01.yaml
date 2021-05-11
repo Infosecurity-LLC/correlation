@@ -1,0 +1,51 @@
+name: CORR-MSWINDOWS-BRUTE-FORCE-ACCOUNT
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+realert:
+  minutes: 60
+
+type: frequency
+num_events: 5
+
+timeframe:
+  minutes: 15
+
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "4625"
+               AND interaction.logonType: ("2" OR "3" OR "10")
+               AND (interaction.reason: ("0xC0000064" OR "0xC000006A")
+                    OR data.aux5: ("0xC0000064" OR "0xC000006A")
+                   )
+               AND NOT subject.name: ("АНОНИМНЫЙ ВХОД" OR "ANONYMOUS LOGON" OR "СИСТЕМА" OR "SYSTEM")
+               AND NOT subject.id: ("S-1-5-7" OR "S-1-5-18")
+              '
+
+# Event ID: "4625" - An account failed to log on
+# logonType: 2 - interactively; 3, 10 - remote
+# 0xC0000064 - User logon with misspelled or bad user account
+# 0xC000006A - User logon with misspelled or bad password
+# S-1-5-7 - Anonymous Logon
+# S-1-5-18 - System (or LocalSystem)
+# Additional filter in script: not event['subject']['name'].endswith('$')
+# key eventSource.location.ip for anti-duplicate
+
+query_key:
+ - 'collector.organization'
+ - 'subject.name'
+ - 'eventSource.location.ip'
+
+aggregation:
+  minutes: 3
+aggregation_key:
+ - 'collector.organization'
+ - 'subject.name'
+ - 'eventSource.location.ip'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'access'
+severity: 'MEDIUM'

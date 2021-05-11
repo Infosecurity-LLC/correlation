@@ -1,0 +1,29 @@
+name: CORR-MSWINDOWS-ACCOUNT-WAS-DISABLED
+
+index: correlator-windows_2008-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: "4725"'
+
+# Event ID: "4725" - A user account was disabled
+
+aggregation:
+  minutes: 2
+  
+aggregation_key: 
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'Microsoft'
+system: 'OS'
+event_category: 'ActionsControl'
+list: 'critical_hosts'

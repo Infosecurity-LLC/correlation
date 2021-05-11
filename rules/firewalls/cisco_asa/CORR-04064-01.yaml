@@ -1,0 +1,32 @@
+name: CORR-CISCOASA-FORBIDDEN-WORK-ON-WEEKENDS
+index: correlator-cisco_asa_401-%Y.%m.%d
+use_strftime_index: true
+
+realert:
+  minutes: 0
+
+type: any
+filter:
+ - query:
+     query_string:
+       query: 'data.msgId: ("611101" OR "605005" OR "113004" OR "113012")
+               AND subject.enrichment.isWorkingDay: false
+       '
+
+# Message: "611101" - User authentication succeeded
+# Message: "605005" - Login permitted
+# Message: "113004" - AAA user aaa_type Successful
+# Message: "113012" - AAA user authentication Successful
+
+aggregation:
+  minutes: 3
+aggregation_key: 
+ - 'collector.organization'
+ - 'subject.name'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+out_es_index: correlated
+vendor: 'cisco'
+system: 'firewall'
+event_category: 'access'
+severity: 'LOW'

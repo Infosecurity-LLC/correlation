@@ -1,0 +1,40 @@
+name: CORR-FAIL2BAN-SSH-BAN
+
+# Temporary
+index: correlator-fail2ban-%Y.%m.%d
+use_strftime_index: true
+
+# Temporary
+realert:
+  minutes: 60
+
+type: any
+
+# Temporary
+filter:
+  - query:
+      query_string:
+        query: '
+          interaction.action: "deny" 
+          AND _exists_: collector.organization 
+          AND _exists_: eventSource.location.host
+        '
+
+aggregation:
+  minutes: 5
+
+aggregation_key: 
+ - 'collector.organization'
+ - 'eventSource.location.host'
+
+alert: custom_alerters.es.ElasticSearchAlerter
+
+out_es_index: correlated
+
+vendor: 'linux'
+
+system: 'firewall'
+
+event_category: 'network'
+
+severity: 'MEDIUM'
